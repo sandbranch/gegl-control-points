@@ -1,0 +1,47 @@
+[
+ {
+  "file": "poppy-leaves.jpg",
+  "kind": "flower",
+  "title": "File:A bright red poppy flower.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:A_bright_red_poppy_flower.jpg",
+  "license": "CC0",
+  "author": "Spring's Flowers",
+  "credit": "Own work, 2024-05-11",
+  "size": "4080x1884",
+  "description": "Red poppies among green leaves and grass"
+ },
+ {
+  "file": "rose-green.jpg",
+  "kind": "flower",
+  "title": "File:Red roses in bloom (Unsplash).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Red_roses_in_bloom_(Unsplash).jpg",
+  "license": "CC0",
+  "author": "Henrique Ferreira",
+  "credit": "https://unsplash.com/photos/LZCGRSQxn6E (2016-09-12, before Unsplash left CC0 on 2017-06-05)",
+  "size": "5154x3436",
+  "description": "A red rose before soft green leaves"
+ },
+ {
+  "file": "poppies-sky.jpg",
+  "kind": "scene",
+  "title": "File:Red poppies under morning sun (Unsplash).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Red_poppies_under_morning_sun_(Unsplash).jpg",
+  "license": "CC0",
+  "author": "Corina Ardeleanu",
+  "credit": "https://unsplash.com/photos/sWlxCweDzzs (2015-10-15, before Unsplash left CC0 on 2017-06-05)",
+  "size": "3666x2209",
+  "description": "Red poppies, green grass and a blue sky with the sun"
+ },
+ {
+  "file": "rose-bush-24mp.jpg",
+  "kind": "timing",
+  "full_size": true,
+  "title": "File:Blooming Rose Bush (Unsplash).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Blooming_Rose_Bush_(Unsplash).jpg",
+  "license": "CC0",
+  "author": "Jeffrey Wegrzyn",
+  "credit": "https://unsplash.com/photos/z_hoxgLxvP0 (2016-05-28, before Unsplash left CC0 on 2017-06-05)",
+  "size": "6000x4000",
+  "description": "A red rose on a dark bush, 24 megapixels, for the timing"
+ }
+]
