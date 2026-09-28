@@ -28,7 +28,8 @@ shared_module('control-points',
 )
 
 test_c_args = ['-DGEGL_PLUGINSDIR="@0@"'.format(
-  gegl_dep.get_variable(pkgconfig: 'pluginsdir'))]
+  gegl_dep.get_variable(pkgconfig: 'pluginsdir')),
+  '-DSRCDIR="@0@"'.format(meson.project_source_root())]
 
 # numerical checks of the operation: tests/check.sh, or meson test -C build
 check = executable('check', 'tests/check.c',

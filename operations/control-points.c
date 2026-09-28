@@ -190,10 +190,10 @@ property_double (structure_size, _("Structure size"), 4.0)
 #define CP_SAMPLE_HALF   2
 /* selectivity s: a Gaussian in the color distance of width
  * CP_TAU_50 * 50 / s (in CIE Lab units, L from 0 to 100) */
-#define CP_TAU_50        20.0f
-/* lightness counts half in the color distance: the parts of one object
+#define CP_TAU_50        25.0f
+/* lightness counts 0.4 in the color distance: the parts of one object
  * differ more in light and shade than in hue */
-#define CP_L_WEIGHT      0.5f
+#define CP_L_WEIGHT      0.4f
 /* warmth at 100: red gain 1 + this, blue gain 1 - this, luminance kept */
 #define CP_WARMTH        0.3f
 /* brightness b (-1 to 1): lightness L to L^(2^(-CP_BRIGHT b)) */
@@ -219,7 +219,7 @@ typedef struct
 typedef struct
 {
   gint    index;              /* 0 to 7 */
-  gdouble cx, cy;             /* center */
+  gdouble cx, cy;             /* center, from the image's top left corner */
   gdouble radius;             /* reach, > 0 */
   gfloat  inv_r2;             /* 1 / radius^2 */
   gfloat  inv_2tau2;          /* 1 / (2 tau^2), 0 without selectivity */
@@ -365,8 +365,10 @@ cp_points (GeglOperation *operation,
       if (! s.on)
         continue;
       p->index  = i;
-      p->cx     = ext.x + CLAMP (s.x, 0.0, 1.0) * ext.width;
-      p->cy     = ext.y + CLAMP (s.y, 0.0, 1.0) * ext.height;
+      /* from the top left corner of the image, so that the pixels are
+       * the same wherever the image is */
+      p->cx     = CLAMP (s.x, 0.0, 1.0) * ext.width;
+      p->cy     = CLAMP (s.y, 0.0, 1.0) * ext.height;
       p->radius = MAX (0.5, CLAMP (s.size, 0.5, 150.0) / 100.0 * longer);
       p->inv_r2 = (gfloat) (1.0 / (p->radius * p->radius));
       sel       = CLAMP (s.sel, 0.0, 100.0);
@@ -387,9 +389,11 @@ cp_points (GeglOperation *operation,
       p->reach.y      = (gint) floor (p->cy - p->radius);
       p->reach.width  = (gint) ceil (p->cx + p->radius) - p->reach.x + 1;
       p->reach.height = (gint) ceil (p->cy + p->radius) - p->reach.y + 1;
+      p->reach.x     += ext.x;
+      p->reach.y     += ext.y;
       /* the pixel under the point, inside the image, and its square */
-      sx = CLAMP ((gint) floor (p->cx), ext.x, ext.x + ext.width - 1);
-      sy = CLAMP ((gint) floor (p->cy), ext.y, ext.y + ext.height - 1);
+      sx = ext.x + CLAMP ((gint) floor (p->cx), 0, ext.width - 1);
+      sy = ext.y + CLAMP ((gint) floor (p->cy), 0, ext.height - 1);
       p->sample.x = sx - CP_SAMPLE_HALF;
       p->sample.y = sy - CP_SAMPLE_HALF;
       p->sample.width = p->sample.height = 2 * CP_SAMPLE_HALF + 1;
@@ -772,7 +776,7 @@ process (GeglOperation       *operation,
   for (y = 0; y < roi->height; y++)
     {
       gint    gy = roi->y + y;
-      gfloat  fy = gy + 0.5f;
+      gfloat  fy = (gy - ext.y) + 0.5f;
       CpPoint *row[CP_N];
       gfloat  row_dy2[CP_N];
       gint    row_x0[CP_N], row_x1[CP_N], row_k[CP_N];
@@ -788,8 +792,8 @@ process (GeglOperation       *operation,
           if (dy * dy >= p->radius * p->radius)
             continue;
           hw = sqrt (p->radius * p->radius - dy * dy);
-          row_x0[n_row] = MAX (roi->x, (gint) floor (p->cx - hw - 0.5));
-          row_x1[n_row] = MIN (roi->x + roi->width - 1, (gint) ceil (p->cx + hw - 0.5));
+          row_x0[n_row] = MAX (roi->x, ext.x + (gint) floor (p->cx - hw - 0.5));
+          row_x1[n_row] = MIN (roi->x + roi->width - 1, ext.x + (gint) ceil (p->cx + hw - 0.5));
           if (row_x0[n_row] > row_x1[n_row])
             continue;
           row_dy2[n_row] = (gfloat) (dy * dy);
@@ -803,7 +807,7 @@ process (GeglOperation       *operation,
         {
           gfloat *px = buf + ((gsize) y * roi->width + x) * 4;
           gint    gx = roi->x + x;
-          gfloat  fx = gx + 0.5f;
+          gfloat  fx = (gx - ext.x) + 0.5f;
           gfloat  w[CP_N];
           gfloat  lab[3];
           gboolean have_lab = FALSE;
