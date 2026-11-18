@@ -183,12 +183,13 @@ downsamples the projection).
     tests/gui/shots.sh        # the dialog on Broadway, the screenshots
     tests/bench.sh            # 24 megapixels
 
-Everything builds and runs inside the GIMP Flatpak's SDK
+Everything builds and runs against the native GIMP 3 and GEGL
 (gimp-devtools/gimp-build.sh) with a throwaway home in tests/output;
 each script lists the user's folders of GIMP and other apps before and
 after (tests/isolate.sh, a copy of gimp-devtools/isolate.sh) and fails if
-anything changed. Results with GIMP 3.2.6 (Flatpak), GEGL 0.4.72, babl
-0.1.128:
+anything changed. Results measured 2026-09 with GIMP 3.2.6 (then the
+Flatpak), GEGL 0.4.72, babl 0.1.128; all checks pass with the native
+GIMP 3.2.8 of Ubuntu (2026-11-18):
 
 - **Selectivity**, a generated red flower crossed by green leaf stripes,
   a point on a petal, brightness +60 and saturation -60, mean change
@@ -258,15 +259,18 @@ eight points of size 20.
 
 ## Building
 
-With the Flatpak GIMP and its SDK (see gimp-devtools):
+For the native GIMP 3 and its development files (on Debian and Ubuntu
+`sudo apt install gimp libgimp-3.0-dev meson ninja-build`; the tests also
+use the `gegl` program, `sudo apt install gegl`):
 
-    gimp-build.sh . meson setup build -Dmoduledir=\$GEGL_OPDIR
-    gimp-build.sh . ninja -C build install
+    meson setup build -Dmoduledir=$HOME/.local/share/gegl-0.4/plug-ins
+    ninja -C build install
 
-`$GEGL_OPDIR` is `~/.var/app/org.gimp.GIMP/data/gegl-0.4/plug-ins` for the
-Flatpak, `~/.local/share/gegl-0.4/plug-ins` natively. With a native GIMP 3
-and its development files, plain `meson setup build
--Dmoduledir=~/.local/share/gegl-0.4/plug-ins && ninja -C build install`.
+or the same through gimp-devtools, which finds the folder itself:
+
+    ../gimp-devtools/gimp-build.sh . meson setup build -Dmoduledir=\$GEGL_OPDIR
+    ../gimp-devtools/gimp-build.sh . ninja -C build install
+
 Restart GIMP after installing.
 
 ## License

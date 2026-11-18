@@ -6,7 +6,7 @@
 position (GIMP's coordinate picker), size, color selectivity,
 brightness, contrast, saturation, warmth and structure, mask views, in
 Colors > Control Points. Tested with tests/check.sh (50 checks, 48 also
-under ASan and UBSan), tests/gimp-check.sh (GIMP 3.2.6 Flatpak: every
+under ASan and UBSan), tests/gimp-check.sh (native GIMP 3.2.8: every
 precision, grayscale, a layer with offsets, XCF, the command line),
 tests/gui/shots.sh (the dialog on Broadway, both points placed with the
 picker, masks, split view, OK, the XCF read back; screenshots looked at),

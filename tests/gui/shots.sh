@@ -178,7 +178,7 @@ stop_all
 xcf=$gui_out/gui-points.xcf
 if [ -f "$xcf" ]; then
     GIMP3_DIRECTORY="$out/gimp-profile"
-    GEGL_PATH="$out/gimp-check-modules:/app/lib/gegl-0.4"
+    GEGL_PATH="$out/gimp-check-modules:$gegl_sysdir"
     export GIMP3_DIRECTORY GEGL_PATH
     pass_env="GIMP3_DIRECTORY GEGL_PATH"
     run_prefix="--timeout=600" in_gimp gimp-console-3.2 --no-interface --no-data --no-fonts \
