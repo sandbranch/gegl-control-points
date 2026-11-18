@@ -49,17 +49,27 @@ dialog_rect () {
 # where it is; sets vx, vy (its visible top left corner) and vw (its
 # visible width)
 move_dialog () {
-    r=$(dialog_rect)
-    [ -n "$r" ] || return 1
-    l=${r%%,*}; r=${r#*,}; t=${r%%,*}; r=${r#*,}; w=${r%%,*}
-    vw=$((w - 52))
-    tx=$((1278 - vw)); ty=120
-    gx=$((l + w / 2)); gy=$((t + 36))
-    $cdp "$view" down:$gx,$gy move:$(( (gx + tx + vw / 2) / 2 )),$(( (gy + ty + 10) / 2 )) \
-      move:$((tx + vw / 2)),$((ty + 10)) up:$((tx + vw / 2 + 1)),$((ty + 10)) wait:1200 >/dev/null
-    r=$(dialog_rect)
-    [ -n "$r" ] || return 1
-    l=${r%%,*}; r=${r#*,}; t=${r%%,*}
+    tries=0
+    while :; do
+        r=$(dialog_rect)
+        [ -n "$r" ] || return 1
+        l=${r%%,*}; r=${r#*,}; t=${r%%,*}; r=${r#*,}; w=${r%%,*}
+        vw=$((w - 52))
+        tx=$((1278 - vw)); ty=120
+        # there (within a few pixels): done
+        if [ $((l + 26 - tx)) -ge -8 ] && [ $((l + 26 - tx)) -le 8 ] &&
+           [ $((t + 26 - ty)) -ge -8 ] && [ $((t + 26 - ty)) -le 8 ]; then
+            break
+        fi
+        # a drag on Broadway does not always take (seen with a dialog
+        # opened half below the page): try again
+        tries=$((tries + 1))
+        [ $tries -le 3 ] || return 1
+        gx=$((l + w / 2)); gy=$((t + 36))
+        $cdp "$view" move:$gx,$gy wait:300 down:$gx,$gy wait:300 \
+          move:$(( (gx + tx + vw / 2) / 2 )),$(( (gy + ty + 10) / 2 )) wait:200 \
+          move:$((tx + vw / 2)),$((ty + 10)) wait:200 up:$((tx + vw / 2 + 1)),$((ty + 10)) wait:1200 >/dev/null
+    done
     vx=$((l + 26)); vy=$((t + 26))
 }
 # a point in the dialog, from its visible top left corner
@@ -86,12 +96,11 @@ LEAVES_X=250; LEAVES_Y=820
 first_filter () {
     $cdp "$view" click:$COLORS wait:1500 click:$ITEM wait:5000 >/dev/null
 }
+# (GIMP 3.2.8 does not always reopen the dialog where it was dragged
+# to, so it is dragged to the top right corner each time)
 open_filter () {
     first_filter
-    r=$(dialog_rect)
-    [ -n "$r" ] || return 1
-    l=${r%%,*}; r=${r#*,}; t=${r%%,*}; r=${r#*,}; w=${r%%,*}
-    vx=$((l + 26)); vy=$((t + 26)); vw=$((w - 52))
+    move_dialog
 }
 
 # press on the canvas at page position $1, with the picker of the
@@ -139,7 +148,7 @@ else
 fi
 
 if open_filter; then
-    pass "dialog: opened where the first one was dragged to"
+    pass "dialog: opened, dragged to the top right corner"
     $cdp "$view" wait:500 shot:"$docs/dialog.png" >/dev/null
     # point 1 on a petal, with the picker
     pick "$(at $PETAL_X $PETAL_Y)"
